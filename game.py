@@ -17,7 +17,8 @@ class Game:
         pygame.init()
         self._caption = 'Стрелялка'
         self._clock = pygame.time.Clock()
-        self._screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        self.screen = pygame.display.set_mode(
+            (self.WIDTH, self.HEIGHT))
 
         # Gets path for current folder and images folder.
         game_folder = os.path.dirname(__file__)
@@ -31,13 +32,11 @@ class Game:
             x=self.WIDTH // 2, y=self.HEIGHT - 50)
 
         # TODO: spawn 10 mobs and put them into separate sprite group.
-        self.mobs = []
-        for r in range(1, 300, 40):
-            x =  r * 1
-            y = r * 1
-            # self.enemies = pygame.sprite.Group()
-            self.mobs.append(player.Player('enemy', x, y))
-        # self.enemies.add(self.enemy)
+        self.enemies = []
+        for index in range(1, 10):
+            x = random.randint(1, self.WIDTH)
+            y = random.randint(1, self.HEIGHT // 2)
+            self.enemies.append(player.Player('enemy', x, y))
 
     def _display_fps(self):
         pygame.display.set_caption(f'{self._caption} [FPS]: {
@@ -63,13 +62,17 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-            self._screen.fill(self.BLACK)
-            self._screen.blit(
+            self.screen.fill(self.BLACK)
+            self.screen.blit(
                 self.background, self.background_rect)
-            self._screen.blit(
+            
+            # render hero on the screen.
+            self.screen.blit(
                 self.hero.image, (self.hero.x, self.hero.y))
-            for mob in self.mobs:
-                self._screen.blit(mob.image, (mob.x, mob.y))
+            
+            # render enemies on the screen.
+            for enemy in self.enemies:
+                self.screen.blit(enemy.image, (enemy.x, enemy.y))
             pygame.display.flip()
 
         pygame.quit()
