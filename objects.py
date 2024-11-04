@@ -18,8 +18,9 @@ class GameObject:
         self.current_frame = 0
         self.last_update = 0
         self.animation_speed = 50 # milliseconds
-        self.frames = animator.load_sprite(
-            os.path.join(images_folder, f'{self.name}.png'), 96, 96)
+        # TODO: Add try/except block to catch FileNotFoundError
+        self.frames = list(animator.load_frames(
+            os.path.join(images_folder, f'{self.name}.png'), 96, 96))
         
         self.image = self.frames[self.current_frame]
         try:
