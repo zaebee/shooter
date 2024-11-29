@@ -1,5 +1,6 @@
 """Shooter game based on pygame engine."""
 import os
+import math
 import pygame
 import random
 
@@ -9,17 +10,31 @@ import explosion
 import objects
 import splash
 
+_config = objects._GAME
+
+def scroll(img, screen, scroll_offset=0, speed=1):
+    """Scrolls image background with `speed`. """
+    tiles = math.ceil(screen.get_height() / img.get_height()) + 1
+
+    for i in range(tiles):
+        screen.blit(img, (0, -img.get_height() * i - scroll_offset)) 
+    scroll_offset -= speed
+    if abs(scroll_offset) > img.get_height(): 
+        scroll_offset = 0
+    return scroll_offset
+
+
 class Game:
-    WIDTH = 800
-    HEIGHT = 600
+    WIDTH = _config['WIDTH']
+    HEIGHT = _config['HEIGHT']
     WHITE = (255, 255, 255)  # ffffff
     BLACK = (0, 0, 0)  # 000000
-    FPS = 60
+    FPS: int = 60
 
     def __init__(self):
         pygame.init()
         self.sound = pygame.mixer.music.load(
-            os.path.join(objects.sounds_folder, 'space.ogg'))
+            os.path.join(_config ['SOUNDS'], 'space.ogg'))
         pygame.mixer.music.set_volume(0.1)
         # pygame.mixer.music.play()
         self._caption = 'Стрелялка'
@@ -27,23 +42,21 @@ class Game:
         self.screen = pygame.display.set_mode(
             (self.WIDTH, self.HEIGHT))
 
-        # Gets path for current folder and images folder.
-        game_folder = os.path.dirname(__file__)
-        images_folder = os.path.join(game_folder, 'images')
-        # Load background image from file, like: /path/to/file/images/bg.png
+        # Load background image from _config, like: /path/to/file/images/bg.png
         self.background = pygame.image.load(
-            os.path.join(images_folder, 'bg.png'))
+            os.path.join(_config['IMAGES'], 'bg.png'))
         self.background_rect = self.background.get_rect()
 
         self.hero = player.Player(
             x=self.WIDTH // 2, y=self.HEIGHT - 50)
 
         # TODO: spawn 10 mobs and put them into separate sprite group.
-        self.enemies = []
-        for index in range(5):
+        self.enemies = pygame.sprite.Group()
+        for _ in range(5):
             x = random.randint(1, self.WIDTH - 40)
             y = random.randint(1, self.HEIGHT // 2)
-            self.enemies.append(enemy.Enemy(x=x, y=y))
+            # self.enemies.add(
+            enemy.Enemy(x, y, [self.enemies])
 
     def _display_fps(self):
         pygame.display.set_caption(
@@ -54,11 +67,11 @@ class Game:
         running = True
         bullet = None # Instance of Weapon gameObject.
         boom = None # Instance of Explosion gameObject.
-        splash.load_menu(self.screen)
+        # splash.load_menu(self.screen)
         while running == True:
             self._display_fps()
             self._clock.tick(self.FPS)
-            # Handles pygame events
+            # TODO: Handles pygame events
             keys = pygame.key.get_pressed() 
             if keys[pygame.K_a]:
                 self.hero.moveLeft()
@@ -68,9 +81,9 @@ class Game:
                 self.hero.moveDown()
             if keys[pygame.K_w]:
                 self.hero.moveUp()
-            if keys[pygame.K_SPACE]:
+            if keys[pygame.K_SPACE] and not bullet:
                 bullet = self.hero.shoot()
-                boom = explosion.Explosion(x=bullet.x, y=bullet.y)
+                # boom = explosion.Explosion(x=bullet.x, y=bullet.y)
             # TODO: disallow to move if X or Y out of screen size.
             for event in pygame.event.get(): # [event1, event2,]
                 if event.type == pygame.QUIT:
@@ -79,12 +92,10 @@ class Game:
             self.screen.blit(
                 self.background, self.background_rect)
             
+            self.enemies.update()
             # render bullet on the screen.
             if bullet:
-                boom = explosion.Explosion(x=bullet.x, y=bullet.y)
-                self.screen.blit(boom.image, (boom.x, boom.y))
-                self.screen.blit(bullet.image, (bullet.x, bullet.y))
-                
+                self.screen.blit(bullet.image, bullet.rect)
                 bullet.update()
             if boom:
                 self.screen.blit(boom.image, (boom.x, boom.y))
@@ -92,11 +103,20 @@ class Game:
             # render hero on the screen.
             self.screen.blit(
                 self.hero.image, (self.hero.x, self.hero.y))
-            
+
             # render enemies on the screen.
-            for enemy_object in self.enemies:
-                self.screen.blit(enemy_object.image, (enemy_object.x, enemy_object.y))
-                enemy_object.update()
+            if bullet:
+                collide = pygame.sprite.spritecollide(bullet, self.enemies, False)
+                for e in collide:
+                    print('Damaged enemy: ', e)
+                    bullet.kill()
+                    e.kill()
+                if bullet.is_out():
+                    bullet.kill()
+                    bullet = None
+            
+            self.enemies.draw(self.screen)
+            splash.load_score(self.screen, 0)
             pygame.display.flip()
 
         pygame.quit()

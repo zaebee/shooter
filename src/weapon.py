@@ -15,6 +15,11 @@ class Bullet(objects.GameObject):
         
     def update(self):
         """Updates Y coordinates every tick"""
-        self.y -= self.speed # self.y = self.y - self. speed
-        self.x += random.randrange(-3, 3)
+        self.rect.y -= self.speed # self.y = self.y - self. speed
+        # self.rect.x += random.randrange(-3, 3)
+        if self.rect.y < 0:
+            self.kill()
+    
+    def is_out(self):
+        return self.rect.y < 0
         

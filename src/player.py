@@ -7,7 +7,7 @@ class Player(objects.GameObject):
     y = 0
     speed = 5
     name = 'hero'
-
+        
     def moveRight(self):
         self.x = self.x + self.speed
 
@@ -20,8 +20,9 @@ class Player(objects.GameObject):
     def moveDown(self):
         self.y = self.y + self.speed
         
-    def shoot(self):
-        item = weapon.Fireball(x=self.x, y=self.y)
-        # item.sound.set_volume(0.2)
-        # item.sound.play()
-        return item
+    def shoot(self, name='laser'):
+        bullet = weapon.Bullet(x=self.x, y=self.y, filename=name)
+        if bullet.sound:
+            bullet.sound.set_volume(0.03)
+            bullet.sound.play()
+        return bullet

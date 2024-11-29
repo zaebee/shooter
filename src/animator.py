@@ -9,11 +9,11 @@ def load_frames(filename: str, width: int, height: int):
             width - ширина кадра
             height - высота кадра
     """
-   
     sprite = pygame.image.load(filename).convert_alpha()
     for y in range(0, sprite.get_height(), height):
         for x in range(0, sprite.get_width(), width):
             rect = pygame.Rect(x, y, width, height)
             image = pygame.Surface(rect.size, pygame.SRCALPHA)
             image.blit(sprite, (0, 0), rect)
-            yield image
+            # frame, total = x % width, sprite.get_width() // width
+            yield image# , frame, total

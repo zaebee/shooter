@@ -1,0 +1,48 @@
+import os
+import pygame
+import animator
+
+_GAME = {
+    'WIDTH': 800,
+    'HEIGHT': 600,
+    'ROOT': os.path.dirname(__file__),
+    'IMAGES': os.path.join(os.path.dirname(__file__), 'images'),
+    'SOUNDS': os.path.join(os.path.dirname(__file__), 'sounds'),    
+}
+
+_config = _GAME
+
+game_folder = os.path.dirname(__file__)
+images_folder = os.path.join(game_folder, 'images')
+sounds_folder = os.path.join(game_folder, 'sounds')
+
+sprite = pygame.sprite.Sprite
+
+class GameObject(pygame.sprite.Sprite):
+    """Base class for any game object."""
+    def __init__(
+        self, x, y, *args, **kwargs):
+        # TODO: Add try/except block to catch FileNotFoundError
+        super().__init__(*args)
+        self.x = x
+        self.y = y
+        self.name = kwargs.get('filename', self.name)
+        self.current_frame = 0
+        self.last_update = 0
+        self.animation_speed = 50 # milliseconds
+        # TODO: Add try/except block to catch FileNotFoundError
+        self.frames = animator.load_frames(
+            os.path.join(_config['IMAGES'], f'{self.name}.png'), 96, 96)
+        
+        # self.image = self.frames[self.current_frame]
+        self.image = next(self.frames)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        print(f'Init {self.name} {self.groups()} with coords: {self.x}, {self.y}')
+        # TODO: inject sound from devices
+        try:
+            self.sound = pygame.mixer.Sound(
+                os.path.join(_config['SOUNDS'], f'{self.name}.wav'))
+        except FileNotFoundError: 
+            self.sound = None
