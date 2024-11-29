@@ -12,12 +12,6 @@ _GAME = {
 
 _config = _GAME
 
-game_folder = os.path.dirname(__file__)
-images_folder = os.path.join(game_folder, 'images')
-sounds_folder = os.path.join(game_folder, 'sounds')
-
-sprite = pygame.sprite.Sprite
-
 class GameObject(pygame.sprite.Sprite):
     """Base class for any game object."""
     def __init__(
