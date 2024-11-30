@@ -30,6 +30,7 @@ class GameObject(pygame.sprite.Sprite):
         
         # self.image = self.frames[self.current_frame]
         self.image = next(self.frames)
+        
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y

@@ -16,4 +16,4 @@ def load_frames(filename: str, width: int, height: int):
             image = pygame.Surface(rect.size, pygame.SRCALPHA)
             image.blit(sprite, (0, 0), rect)
             # frame, total = x % width, sprite.get_width() // width
-            yield image# , frame, total
+            yield image # , frame, total

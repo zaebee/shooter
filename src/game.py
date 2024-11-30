@@ -12,17 +12,6 @@ import splash
 
 _config = objects._GAME
 
-def scroll(img, screen, scroll_offset=0, speed=1):
-    """Scrolls image background with `speed`. """
-    tiles = math.ceil(screen.get_height() / img.get_height()) + 1
-
-    for i in range(tiles):
-        screen.blit(img, (0, -img.get_height() * i - scroll_offset)) 
-    scroll_offset -= speed
-    if abs(scroll_offset) > img.get_height(): 
-        scroll_offset = 0
-    return scroll_offset
-
 
 class Game:
     WIDTH = _config['WIDTH']
@@ -58,6 +47,17 @@ class Game:
             # self.enemies.add(
             enemy.Enemy(x, y, [self.enemies])
 
+    def scroll(self, img, screen, scroll_offset=0, speed=1):
+        """Scrolls image background with `speed`. """
+        tiles = math.ceil(screen.get_height() / img.get_height()) + 1
+
+        for i in range(tiles):
+            screen.blit(img, (0, -img.get_height() * i - scroll_offset)) 
+        scroll_offset -= speed
+        if abs(scroll_offset) > img.get_height(): 
+            scroll_offset = 0
+        return scroll_offset
+
     def _display_fps(self):
         pygame.display.set_caption(
             f'{self._caption} [FPS]: {self._clock.get_fps()}')
@@ -83,7 +83,6 @@ class Game:
                 self.hero.moveUp()
             if keys[pygame.K_SPACE] and not bullet:
                 bullet = self.hero.shoot()
-                # boom = explosion.Explosion(x=bullet.x, y=bullet.y)
             # TODO: disallow to move if X or Y out of screen size.
             for event in pygame.event.get(): # [event1, event2,]
                 if event.type == pygame.QUIT:
@@ -96,10 +95,7 @@ class Game:
             # render bullet on the screen.
             if bullet:
                 self.screen.blit(bullet.image, bullet.rect)
-                bullet.update()
-            if boom:
-                self.screen.blit(boom.image, (boom.x, boom.y))
-                boom.update() 
+                bullet.update() 
             # render hero on the screen.
             self.screen.blit(
                 self.hero.image, (self.hero.x, self.hero.y))
@@ -108,13 +104,17 @@ class Game:
             if bullet:
                 collide = pygame.sprite.spritecollide(bullet, self.enemies, False)
                 for e in collide:
+                    boom = explosion.Explosion(x=bullet.x, y=bullet.y)
+                    self.screen.blit(boom.image, (boom.x, boom.y))
                     print('Damaged enemy: ', e)
-                    bullet.kill()
-                    e.kill()
+                    #bullet.kill()
+                    #e.kill()
                 if bullet.is_out():
                     bullet.kill()
                     bullet = None
             
+            if boom:
+                boom.update()
             self.enemies.draw(self.screen)
             splash.load_score(self.screen, 0)
             pygame.display.flip()

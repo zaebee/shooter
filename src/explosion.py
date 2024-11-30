@@ -14,7 +14,6 @@ class Explosion(objects.GameObject):
         if current_time - self.last_update > self.animation_speed:
             self.last_update = current_time
             self.current_frame = (self.current_frame + 1) % framerate
-            # print(current_time, self.last_update, self.current_frame, framerate)
             try:
                 self.image = next(self.frames) # [self.current_frame]
             except TypeError:
