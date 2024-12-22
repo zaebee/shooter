@@ -22,14 +22,14 @@ class Enemy(objects.GameObject):
             # after that create Explosion.
             # TODO: create explosion.Explosion(self.x, self.y)
     
-    def update(self):
+    def update(self, speed=3):
         # TODO: change y coord randomly.
-        self.x += self.speed # random.randrange(-5, 5)
+        self.rect.y += speed
         
-        self.y += 5 # self.speed
-        if self.y > objects._config['HEIGHT']:
-            self.y = 0
-            self.x = random.randrange(0, objects._config['WIDTH'])
-        if self.x < 0 or self.x > objects._config['WIDTH']:
-            self.y = 0
-            self.x = random.randrange(0, objects._config['WIDTH'])
+        """ self.y += 5 # self.speed"""
+        if self.rect.y > 800:  # objects._config['HEIGHT']:
+            self.rect.y = 0
+            self.rect.x = random.randrange(0, objects._config['WIDTH'])
+        if self.rect.x < 0 or self.rect.x > objects._config['WIDTH']:
+            self.rect.y = 0
+            self.rect.x = random.randrange(0, objects._config['WIDTH'])

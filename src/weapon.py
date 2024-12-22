@@ -12,7 +12,6 @@ class Bullet(objects.GameObject):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        
     def update(self):
         """Updates Y coordinates every tick"""
         self.rect.y -= self.speed # self.y = self.y - self. speed
@@ -22,4 +21,8 @@ class Bullet(objects.GameObject):
     
     def is_out(self):
         return self.rect.y < 0
-        
+    
+
+class Laser(Bullet):
+    """Laser is super fast."""
+    speed = 12

@@ -21,7 +21,7 @@ class Player(objects.GameObject):
         self.y = self.y + self.speed
         
     def shoot(self, name='laser'):
-        bullet = weapon.Bullet(x=self.x, y=self.y, filename=name)
+        bullet = weapon.Laser(x=self.x, y=self.y, filename="laser")
         if bullet.sound:
             bullet.sound.set_volume(0.03)
             bullet.sound.play()

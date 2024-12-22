@@ -25,27 +25,25 @@ class Game:
         self.sound = pygame.mixer.music.load(
             os.path.join(_config ['SOUNDS'], 'space.ogg'))
         pygame.mixer.music.set_volume(0.1)
+        # TODO: сделать кнопку вкл/выкл звук.
         # pygame.mixer.music.play()
         self._caption = 'Стрелялка'
         self._clock = pygame.time.Clock()
-        self.screen = pygame.display.set_mode(
-            (self.WIDTH, self.HEIGHT))
+        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
 
         # Load background image from _config, like: /path/to/file/images/bg.png
         self.background = pygame.image.load(
             os.path.join(_config['IMAGES'], 'bg.png'))
         self.background_rect = self.background.get_rect()
 
-        self.hero = player.Player(
-            x=self.WIDTH // 2, y=self.HEIGHT - 50)
+        self.hero = player.Player(x=200, y=350, filename="hero")
 
         # TODO: spawn 10 mobs and put them into separate sprite group.
         self.enemies = pygame.sprite.Group()
-        for _ in range(5):
+        for _ in range(10):
             x = random.randint(1, self.WIDTH - 40)
             y = random.randint(1, self.HEIGHT // 2)
-            # self.enemies.add(
-            enemy.Enemy(x, y, [self.enemies])
+            self.enemies.add(enemy.Enemy(x, y, filename="enemy"))
 
     def scroll(self, img, screen, scroll_offset=0, speed=1):
         """Scrolls image background with `speed`. """
@@ -81,7 +79,7 @@ class Game:
                 self.hero.moveDown()
             if keys[pygame.K_w]:
                 self.hero.moveUp()
-            if keys[pygame.K_SPACE] and not bullet:
+            if keys[pygame.K_SPACE]:
                 bullet = self.hero.shoot()
             # TODO: disallow to move if X or Y out of screen size.
             for event in pygame.event.get(): # [event1, event2,]
@@ -100,21 +98,6 @@ class Game:
             self.screen.blit(
                 self.hero.image, (self.hero.x, self.hero.y))
 
-            # render enemies on the screen.
-            if bullet:
-                collide = pygame.sprite.spritecollide(bullet, self.enemies, False)
-                for e in collide:
-                    boom = explosion.Explosion(x=bullet.x, y=bullet.y)
-                    self.screen.blit(boom.image, (boom.x, boom.y))
-                    print('Damaged enemy: ', e)
-                    #bullet.kill()
-                    #e.kill()
-                if bullet.is_out():
-                    bullet.kill()
-                    bullet = None
-            
-            if boom:
-                boom.update()
             self.enemies.draw(self.screen)
             splash.load_score(self.screen, 0)
             pygame.display.flip()
